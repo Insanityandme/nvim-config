@@ -213,7 +213,7 @@ vim.cmd([[
                 set makeprg=build
                 silent make 
                 wincmd o " there shall only be one
-                vert copen 80" open vertically
+                vert copen 85" open vertically
                 wincmd p " keep cursor on previous window
                 wincmd r " rotate windows
                 " wincmd = " full size pls
@@ -272,6 +272,9 @@ vim.cmd([[
 
     " clear screen of highlights (probably not necessary anymore)
     nnoremap <nowait><silent> <leader>l :noh<CR>
+   
+    " to map <Esc> to exit terminal-mode
+    tnoremap <Esc> <C-\><C-n>
 ]])
 
 -- Insert Caseys source format
@@ -333,12 +336,11 @@ vim.api.nvim_buf_set_option(0, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 vim.keymap.set("n", "<M-d>", vim.cmd.DiagnosticToggle)
 vim.keymap.set('i', '<C-d>', '<c-n>', {noremap = true})
 vim.keymap.set('i', '<C-f>', '<C-X><C-o>', {noremap = true})
-vim.keymap.set("n", 'gd', definition_split)
-vim.keymap.set("n", 'gD', vim.lsp.buf.definition)
+vim.keymap.set("n", 'gD', definition_split)
+vim.keymap.set("n", 'gd', vim.lsp.buf.definition)
 vim.keymap.set("n", '<M-r>', toggle_lsp)
+vim.keymap.set("n", '<leader>t', function() vim.cmd.terminal() end)
 
 -- https://github.com/neovim/nvim-lspconfig#keybindings-and-completion
 vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
 vim.cmd([[autocmd FileType * set formatoptions-=ro]])
-
-
