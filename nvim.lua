@@ -234,6 +234,7 @@ vim.cmd([[
     endfunction
 
     function! ExecutePython()
+        wincmd o " there shall only be one
         execute ":vs"
         execute ":term python3 %"
         wincmd r " rotate windows
