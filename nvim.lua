@@ -233,6 +233,13 @@ vim.cmd([[
         execute "cd " . l:starting_directory
     endfunction
 
+    function! ExecutePython()
+        execute ":vs"
+        execute ":term python3 %"
+        wincmd r " rotate windows
+        wincmd p " keep cursor on previous window
+    endfunction
+
     "Go to next error
     nnoremap <leader>n :cn<CR>
     "Go to previous error
@@ -240,7 +247,13 @@ vim.cmd([[
      
     " Set leader+b to build. I like this since I use visual studio with the c++ build env
     " nnoremap <leader>b :call DoBuildBatchFile()<CR>
+
+    " execute c file for casey
     nnoremap <M-m> :call BuildProject()<CR>
+
+    " execute current python file
+    " nnoremap <M-m> :call ExecutePython()<CR>
+
     " autocmd! FileType qf nnoremap <buffer> <leader><Enter> <C-w><Enter><C-w>L
 
     " Opens netrw
