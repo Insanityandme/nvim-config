@@ -1,6 +1,8 @@
 # nvim-config
 This is a one file neovim config file that has everything I need for getting up and running in neovim
 
+NOTE: The shell.bat file is just there to remind me how to work with visual studios compiler for C programs.
+
 ## Linux
 1. Change nvim.lua to init.lua and add it to your ~/.config/nvim folder
 2. Create a folder called colors in ~/.config/nvim and add gruvbox.vim in there
