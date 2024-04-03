@@ -263,6 +263,9 @@ vim.cmd([[
     " just splits a window vertically
     nnoremap <leader>v :vsplit<CR>
 
+    " just splits a window horizontally
+    nnoremap <leader>h :split<CR>
+
     " This is set hidden to prevent the deletion of buffers
     " if they go out of view.
     set hidden
