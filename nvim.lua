@@ -15,6 +15,26 @@ vim.api.nvim_create_autocmd({"BufEnter", "BufWinEnter"}, {
     end
 })
 
+-- LSP config for Python 
+vim.api.nvim_create_autocmd({"BufEnter", "BufWinEnter"}, {
+    pattern = {"*.py"},
+    callback = function()
+        vim.lsp.start({
+            name = 'python-lsp',
+            cmd = {'jedi-language-server'},
+        })
+    end
+})
+
+vim.api.nvim_create_autocmd('LspAttach', {
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    if client.server_capabilities.hoverProvider then
+      vim.keymap.set('n', 'K', vim.lsp.buf.hover, { buffer = args.buf })
+    end
+  end,
+})
+
 -- Toggle LSP diagnostics
 vim.api.nvim_create_user_command("DiagnosticToggle", function()
 	local config = vim.diagnostic.config
@@ -90,58 +110,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 });
 
--- AUTO COMPLETION - COURTESY OF mattb on stackoverflow
--- vim.cmd([[
---     set completeopt+=menuone,noselect,noinsert " don't insert text automatically
--- 
---     set pumheight=5 " keep the autocomplete suggestion menu small
---     set shortmess+=c " don't give ins-completion-menu messages
--- 
---     " if completion menu closed, and two non-spaces typed, call autocomplete
---     let s:insert_count = -1
---     function! OpenCompletion()
---         if string(v:char) =~ ' '
---             let s:insert_count = 0
---         else                    
---             let s:insert_count += 1
---         endif
---         if !pumvisible() && s:insert_count >= 2
---             silent! call feedkeys("\<C-n>", "n")
---         endif
---     endfunction
--- 
---     function! TurnOnAutoComplete()
---     augroup autocomplete
---         autocmd!
---         autocmd InsertLeave let s:insert_count = 0
---         autocmd InsertCharPre * silent! call OpenCompletion()
---     augroup END
---     endfunction
--- 
---     function! TurnOffAutoComplete()
---     augroup autocomplete
---         autocmd!
---     augroup END
---     endfunction
--- 
---     function! ReplayMacroWithoutAutoComplete()
---     call TurnOffAutoComplete()
---     let reg = getcharstr()
---     execute "normal! @".reg
---     call TurnOnAutoComplete()
---     endfunction
--- 
---     call TurnOnAutoComplete()
--- 
---     " don't let the above mess with replaying macros
---     nnoremap <silent> @ :call ReplayMacroWithoutAutoComplete()<CR>
--- 
--- 
--- ]])
-
--- MY OWN STUFF
 vim.cmd([[
-
     set number
     set relativenumber
     let mapleader = " "
@@ -349,10 +318,10 @@ vim.api.nvim_create_autocmd("VimEnter", {
 -- Uses omnifunc for autocompletion
 vim.api.nvim_buf_set_option(0, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
--- Hotkeys <C-x-c-o>
+-- Hotkeys
 vim.keymap.set("n", "<M-d>", vim.cmd.DiagnosticToggle)
 vim.keymap.set('i', '<C-d>', '<c-n>', {noremap = true})
-vim.keymap.set('i', '<C-f>', '<C-X><C-o>', {noremap = true})
+vim.keymap.set('i', '<C-f>', '<c-x><c-o>', {noremap = true})
 vim.keymap.set("n", 'gD', definition_split)
 vim.keymap.set("n", 'gd', vim.lsp.buf.definition)
 vim.keymap.set("n", '<M-r>', toggle_lsp)
