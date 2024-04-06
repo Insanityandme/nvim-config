@@ -210,6 +210,15 @@ vim.cmd([[
         wincmd p " keep cursor on previous window
     endfunction
 
+    function! ExecutePythonTestShell()
+        wincmd o " there shall only be one
+        execute ":vs"
+        cd ..
+        execute ":term ./test.sh"
+        wincmd r " rotate windows
+        wincmd p " keep cursor on previous window
+    endfunction
+
     "Go to next error
     nnoremap <leader>n :cn<CR>
     "Go to previous error
@@ -223,6 +232,9 @@ vim.cmd([[
 
     " execute current python file
     " nnoremap <M-m> :call ExecutePython()<CR>
+
+    " execute test python file
+    nnoremap <M-p> :call ExecutePythonTestShell()<CR>
 
     " autocmd! FileType qf nnoremap <buffer> <leader><Enter> <C-w><Enter><C-w>L
 
