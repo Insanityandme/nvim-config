@@ -26,6 +26,17 @@ vim.api.nvim_create_autocmd({"BufEnter", "BufWinEnter"}, {
     end
 })
 
+-- LSP config for Javacript/Typescript 
+vim.api.nvim_create_autocmd({"BufEnter", "BufWinEnter"}, {
+    pattern = {"*.js", "*.ts", "*.tsx"},
+    callback = function()
+        vim.lsp.start({
+            name = 'js-lsp',
+            cmd = {'typescript-language-server.cmd', '--stdio'}
+        })
+    end
+})
+
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(args)
     local client = vim.lsp.get_client_by_id(args.data.client_id)
@@ -89,7 +100,7 @@ function declaration_split()
   })
 end
 
--- toggles LSP on and off
+-- toggles C LSP on and off
 function toggle_lsp() 
     local clients = vim.lsp.get_active_clients()
     if next(clients) == nil then
@@ -110,7 +121,58 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 });
 
+-- AUTO COMPLETION - COURTESY OF mattb on stackoverflow
+-- vim.cmd([[
+--     set completeopt+=menuone,noselect,noinsert " don't insert text automatically
+-- 
+--     set pumheight=5 " keep the autocomplete suggestion menu small
+--     set shortmess+=c " don't give ins-completion-menu messages
+-- 
+--     " if completion menu closed, and two non-spaces typed, call autocomplete
+--     let s:insert_count = -1
+--     function! OpenCompletion()
+--         if string(v:char) =~ ' '
+--             let s:insert_count = 0
+--         else                    
+--             let s:insert_count += 1
+--         endif
+--         if !pumvisible() && s:insert_count >= 2
+--             silent! call feedkeys("\<C-n>", "n")
+--         endif
+--     endfunction
+-- 
+--     function! TurnOnAutoComplete()
+--     augroup autocomplete
+--         autocmd!
+--         autocmd InsertLeave let s:insert_count = 0
+--         autocmd InsertCharPre * silent! call OpenCompletion()
+--     augroup END
+--     endfunction
+-- 
+--     function! TurnOffAutoComplete()
+--     augroup autocomplete
+--         autocmd!
+--     augroup END
+--     endfunction
+-- 
+--     function! ReplayMacroWithoutAutoComplete()
+--     call TurnOffAutoComplete()
+--     let reg = getcharstr()
+--     execute "normal! @".reg
+--     call TurnOnAutoComplete()
+--     endfunction
+-- 
+--     call TurnOnAutoComplete()
+-- 
+--     " don't let the above mess with replaying macros
+--     nnoremap <silent> @ :call ReplayMacroWithoutAutoComplete()<CR>
+-- 
+-- 
+-- ]])
+
+-- MY OWN STUFF
 vim.cmd([[
+
     set number
     set relativenumber
     let mapleader = " "
@@ -166,19 +228,19 @@ vim.cmd([[
     set errorformat+=\\\ %#%f(%l\\\,%c-%*[0-9]):\ %#%t%[A-z]%#\ %m
      
     function! BuildProject()
-        "save the current working directory so we can come back
+        " save the current working directory so we can come back
         let l:starting_directory = getcwd()
 
-        "get the directory of the currently focused file
+        " get the directory of the currently focused file
         let l:curr_directory = expand('%:p:h')
-        "move to the current file
+        " move to the current file
         execute "cd " . l:curr_directory
 
         while 1
-            "check if build.bat exists in the current directory
+            " check if build.bat exists in the current directory
             " TODO: make this not remove window if nothing happens
             if filereadable("build.bat")
-                "run make and exit
+                " run make and exit
                 set makeprg=build
                 silent make 
                 wincmd o " there shall only be one
@@ -189,10 +251,10 @@ vim.cmd([[
                 echo 'Compilation finished'
             break
             elseif l:curr_directory ==# "/" || l:curr_directory =~# '^[^/]..$'
-                "if we've hit the top level directory, break out
+                " if we've hit the top level directory, break out
                 break
             else
-                "move up a directory
+                " move up a directory
                 cd ..
                 let l:curr_directory = getcwd()
             endif
@@ -212,7 +274,7 @@ vim.cmd([[
 
     function! ExecutePythonTestShell()
         wincmd o " there shall only be one
-        execute ":vs"
+        execute ":vert copen 65"
         cd ..
         execute ":term ./test.sh"
         wincmd r " rotate windows
@@ -226,12 +288,12 @@ vim.cmd([[
      
     " Set leader+b to build. I like this since I use visual studio with the c++ build env
     " nnoremap <leader>b :call DoBuildBatchFile()<CR>
-
+    
     " execute c file for casey
-    nnoremap <M-m> :call BuildProject()<CR>
+    " nnoremap <M-m> :call BuildProject()<CR>
 
     " execute current python file
-    " nnoremap <M-m> :call ExecutePython()<CR>
+    nnoremap <M-m> :call ExecutePython()<CR>
 
     " execute test python file
     nnoremap <M-p> :call ExecutePythonTestShell()<CR>
@@ -273,6 +335,7 @@ vim.cmd([[
    
     " to map <Esc> to exit terminal-mode
     tnoremap <Esc> <C-\><C-n>
+
 ]])
 
 -- Insert Caseys source format
@@ -310,6 +373,11 @@ vim.api.nvim_create_autocmd({"BufNewFile"}, {
         '#endif'
 })
 
+vim.api.nvim_create_autocmd({"BufWritePost"}, {
+    pattern = {"*.py"},
+    command = ':call ExecutePythonTestShell()'
+})
+
 -- Beautiful highlights =D
 -- IF contrast is medium, fg = #282828
 -- IF contrast is hard, fg = #1d2021
@@ -330,7 +398,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
 -- Uses omnifunc for autocompletion
 vim.api.nvim_buf_set_option(0, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
--- Hotkeys
+-- Hotkeys <C-x-c-o>
 vim.keymap.set("n", "<M-d>", vim.cmd.DiagnosticToggle)
 vim.keymap.set('i', '<C-d>', '<c-n>', {noremap = true})
 vim.keymap.set('i', '<C-f>', '<c-x><c-o>', {noremap = true})
