@@ -24,12 +24,6 @@ vim.opt.scrolloff = 8
 vim.opt.foldmethod = "marker"
 vim.opt.fileformat = "unix"
 
--- Colorscheme and background
-vim.g.gruvbox_contrast_dark = "hard"
-vim.opt.termguicolors = true
-vim.cmd("colorscheme gruvbox")
-vim.opt.background = "dark"
-
 -- Disable the Sign Column
 vim.opt.signcolumn = "no"
 
@@ -284,15 +278,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 -- Uses omnifunc for autocompletion
 vim.api.nvim_buf_set_option(0, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
--- Link Treesitter highlight groups to Vim highlight groups to match gruvbox
-vim.api.nvim_set_hl(0, "TSConstant", { link = "Constant" })            -- Constant
-vim.api.nvim_set_hl(0, "TSLabel", { link = "Label" })                  -- Label
-vim.api.nvim_set_hl(0, "TSProperty", { link = "Identifier" })          -- Property
-vim.api.nvim_set_hl(0, "TSConstructor", { link = "Type" })             -- Constructor
-vim.api.nvim_set_hl(0, "TSType", { link = "Type" })                    -- Type
-vim.api.nvim_set_hl(0, "TSNumber", { link = "Number" })                -- Number
-vim.api.nvim_set_hl(0, "TSBoolean", { link = "Boolean" })              -- Boolean
-vim.api.nvim_set_hl(0, "TSNull", { link = "Special" })                 -- Null
 -- Insert Caseys source format
 -- vim.api.nvim_create_autocmd({"BufNewFile"}, {
 --     pattern = {"*.cpp"},
@@ -352,34 +337,25 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Setup lazy.nvim
 require("lazy").setup({
+  { "ellisonleao/gruvbox.nvim", priority = 1000, config = true, opts = ... },
   {
-    -- add your plugins here
+    -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
-    build = ':TSUpdate', -- Automatically update parsers when needed
+    build = ':TSUpdate',
     config = function()
-      require 'nvim-treesitter.configs'.setup {
+      require('nvim-treesitter.configs').setup {
         -- Install the languages you need, or use "maintained" for all maintained parsers
-        ensure_installed = { 'typescript', 'hcl', 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'jsdoc', 'css', 'html', 'editorconfig', 'go', 'gitignore', 'gitattributes', 'json', 'java' },
+        ensure_installed = { 'typescript', 'c', 'hcl', 'bash', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'jsdoc', 'css', 'html', 'editorconfig', 'go', 'gitignore', 'gitattributes', 'json', 'java' },
         -- Autoinstall languages that are not installed
         auto_install = true,
         highlight = {
           enable = true,
-          -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-          --  If you are experiencing weird indenting issues, add the language to
-          --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-          additional_vim_regex_highlighting = true,   -- Enable Vim's regex-based highlighting
+          disable = { "c" }, -- Disable Treesitter highlighting for C
+          additional_vim_regex_highlighting = false,
         },
         indent = { enable = true, disable = { 'ruby' } },
-        -- incremental_selection = {
-        --   enable = true,
-        --   keymaps = {
-        --     init_selection = "<CR>",      -- Start a selection
-        --     node_incremental = "<Tab>",   -- Select the next node
-        --     node_decremental = "<S-Tab>", -- Select the previous node
-        --   },
-        -- },
       }
-    end
+    end,
   },
 
   -- Install nvim-lspconfig for LSP support
@@ -653,3 +629,35 @@ require("lazy").setup({
   },
 })
 
+-- Default options:
+require("gruvbox").setup({
+  terminal_colors = true, -- add neovim terminal colors
+  undercurl = true,
+  underline = true,
+  bold = true,
+  italic = {
+    strings = false,
+    emphasis = true,
+    comments = false,
+    operators = false,
+    folds = true,
+  },
+  strikethrough = true,
+  invert_selection = false,
+  invert_signs = false,
+  invert_tabline = false,
+  invert_intend_guides = false,
+  inverse = true,    -- invert background for search, diffs, statuslines and errors
+  contrast = "hard", -- can be "hard", "soft" or empty string, change this if you want a softer BG!
+  palette_overrides = {
+  },
+  overrides = {},
+  dim_inactive = false,
+  transparent_mode = false,
+})
+
+-- Colorscheme and background
+vim.g.gruvbox_contrast_dark = "hard"
+vim.cmd("colorscheme gruvbox")
+vim.opt.termguicolors = true
+vim.opt.background = "dark"
