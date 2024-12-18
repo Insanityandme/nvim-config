@@ -65,6 +65,18 @@ vim.keymap.set("n", "<leader>l", ":noh<CR>")
 -- Exit terminal mode with Esc
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
 
+-- Automatically set filetype to terraform in .tf files
+vim.api.nvim_create_autocmd({ "BufWritePre", "BufNewFile" }, {
+  pattern = { "*.tf" }, -- List specific file types here
+  command = 'set filetype=terraform'
+})
+
+-- Automatically set filetype to .asm in .inc files
+vim.api.nvim_create_autocmd({ "BufWritePre", "BufNewFile" }, {
+  pattern = { "*.inc" }, -- List specific file types here
+  command = 'set filetype=asm'
+})
+
 -- Go to definition (in a split)
 function definition_split()
   vim.lsp.buf.definition({
@@ -86,18 +98,12 @@ function definition_split()
   })
 end
 
--- Force .tf files to be detected as hcl
-vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-  pattern = { "*.tf", "*.tfvars", "*.tfstack.hcl", "*.tfdeploy.hcl" },
-  command = 'set filetype=hcl'
-})
-
 -- Hotkeys for LSP stuff
 vim.keymap.set("n", "<M-d>", vim.cmd.DiagnosticToggle)
 vim.keymap.set('i', '<C-d>', '<c-n>', { noremap = true })
 vim.keymap.set('i', '<C-f>', '<c-x><c-o>', { noremap = true })
 vim.keymap.set("n", 'gD', definition_split)
-vim.keymap.set("n", 'gd', vim.lsp.buf.definition)
+-- vim.keymap.set("n", 'gd', vim.lsp.buf.definition)
 vim.keymap.set("n", '<leader>t', function() vim.cmd.terminal() end)
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
@@ -345,12 +351,12 @@ require("lazy").setup({
     config = function()
       require('nvim-treesitter.configs').setup {
         -- Install the languages you need, or use "maintained" for all maintained parsers
-        ensure_installed = { 'typescript', 'c', 'hcl', 'bash', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'jsdoc', 'css', 'html', 'editorconfig', 'go', 'gitignore', 'gitattributes', 'json', 'java' },
+        ensure_installed = { 'typescript', 'c', 'terraform', 'bash', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'jsdoc', 'css', 'html', 'editorconfig', 'go', 'gitignore', 'gitattributes', 'json', 'java' },
         -- Autoinstall languages that are not installed
         auto_install = true,
         highlight = {
           enable = true,
-          disable = { "c" }, -- Disable Treesitter highlighting for C
+          disable = {}, -- Disable Treesitter highlighting for C
           additional_vim_regex_highlighting = false,
         },
         indent = { enable = true, disable = { 'ruby' } },
@@ -457,11 +463,6 @@ require("lazy").setup({
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
         -- pickers = {}
         extensions = {
           ['ui-select'] = {
@@ -476,6 +477,7 @@ require("lazy").setup({
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
+      -- TODO: get code actions kekW
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
@@ -483,9 +485,12 @@ require("lazy").setup({
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-      vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
+      -- vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader>sr', builtin.lsp_references, { desc = '[G]oto [R]eferences}'})
+      vim.keymap.set('n', 'gd', builtin.lsp_definitions, { desc = '[G]oto [D]efinitions}'})
+      vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, { desc = '[C]ode [A]ction' }, { 'n', 'x' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
